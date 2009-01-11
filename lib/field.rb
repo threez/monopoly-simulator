@@ -89,6 +89,10 @@ module Monopoly
       def houses?
         @houses != NO_HOUSE
       end
+      
+      def houses
+        @houses
+      end
 
       def fields_of_kind
         @owner.find_streets(self.class).select do |field|

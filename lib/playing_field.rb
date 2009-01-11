@@ -84,7 +84,7 @@ module Monopoly
     
     def go_to_jail(player)
       @field_jail << player
-      set_position(player, @field_jail)
+      set_player_position(player, @field_jail)
     end
     
     def player_in_jail?(player)
@@ -95,23 +95,31 @@ module Monopoly
       @field_jail.leave player # leave jail
     end
     
-    def set_position(player, field)
+    def set_player_position(player, field)
       player.current_field = field
       @player_positions[player] = position_of(field)
     end
     
     def enter_field(player, field)
-      set_position(player, field)
+      set_player_position(player, field)
       if field.respond_to? :enter_field
         field.enter_field(player, self)
       end
     end
     
     def pass_field(player, field)
-      set_position(player, field)
+      set_player_position(player, field)
       if field.respond_to? :pass_field
         field.pass_field(player, self)
       end
+    end
+    
+    def next_field_of_type(player, field_class)
+      current_position = @player_positions[player]
+      begin
+        current_position += 1
+      end while @playing_field[current_position].class != field_class
+      return @playing_field[current_position]
     end
     
     # value can ether be a field or a dice value

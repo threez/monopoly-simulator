@@ -107,7 +107,7 @@ module Monopoly
       player.decrease_money(300)
     end,
     Card.new("R\xC3\xBCcke vor bis zum n\xC3\xA4chsten Bahnhof. Der Eigent\xC3\xBCmer erh\xC3\xA4lt das Doppelte der normalen Miete. Hat noch kein Spieler einen Besitzanspruch auf diesen Bahnhof, so kannst Du ihn von der Bank kaufen.") do |card, card_stack, player, other_players, playing_field|
-      playing_field.player_move_to(player, playing_field.next_field_of_type(player, FieldStation))
+      playing_field.player_move_to(player, playing_field.next_field_of_type(player, Fields::Station))
     end,
     Card.new("Gehe zur\xC3\xBCck zu Badstra\xC3\x9f") do |card, card_stack, player, other_players, playing_field|
       playing_field.player_move_to(player, playing_field.field(2))
