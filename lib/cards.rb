@@ -21,7 +21,7 @@ module Monopoly
     end
     
     def next_card
-      card = @card[@iteration]
+      card = @cards[@iteration]
       
       # select next card
       if @iteration == @cards.size - 1
@@ -50,48 +50,48 @@ module Monopoly
   
   CommunityCards = CardStack.new([
     Card.new("Es ist dein Geburtstag. Ziehe von jedem Spieler DM 1000,- ein.") do |card, card_stack, player, other_players, playing_field|  
-      other_players.transfer_money_to(player, 1000)
+      other_players.each { |player| player.transfer_money_to(player, 1000) }
     end,
-    Card.new("Gehe in das Gefängnis! Begib Dich direkt dorthin. Gehe nicht über LOS. Ziehe nicht DM 4000,- ein.") do |card, card_stack, player, other_players, playing_field|
+    Card.new("Gehe in das Gef\xC3\xA4ngnis! Begib Dich direkt dorthin. Gehe nicht \xC3\xBCber LOS. Ziehe nicht DM 4000,- ein.") do |card, card_stack, player, other_players, playing_field|
       playing_field.go_to_jail(player)
     end,
     Card.new("Zahle Schulgeld: DM 3000,-") do |card, card_stack, player, other_players, playing_field|
       player.decrease_money(3000)
     end,
-    Card.new("Die Jahresrente wird fällig. Ziehe DM 2000,- ein.") do |card, card_stack, player, other_players, playing_field|
+    Card.new("Die Jahresrente wird f\xC3\xA4llig. Ziehe DM 2000,- ein.") do |card, card_stack, player, other_players, playing_field|
       player.raise_money(2000)
     end,
-    Card.new("Du hast den 2. Preis in einer Schönheitskonkurrenz gewonnen. Ziehe DM 200,- ein.") do |card, card_stack, player, other_players, playing_field|
+    Card.new("Du hast den 2. Preis in einer Sch\xC3\xB6nheitskonkurrenz gewonnen. Ziehe DM 200,- ein.") do |card, card_stack, player, other_players, playing_field|
       player.raise_money(200)
     end,
     Card.new("Bank-Irrtum zu Deinen Gunsten. Ziehe DM 4000,- ein.") do |card, card_stack, player, other_players, playing_field|
       player.raise_money(4000)
     end,
-    Card.new("Du wirst zu Straßenausbesserungsarbeiten herangezogen. Zahle für Deine Häuser und Hotels DM 800,- je Haus DM 2300,- je Hotel an die Bank.") do |card, card_stack, player, other_players, playing_field|
+    Card.new("Du wirst zu Stra\xC3\x9fnausbe\xC3\x9ferungsarbeiten herangezogen. Zahle f\xC3\xBCr Deine H\xC3\xA4user und Hotels DM 800,- je Haus DM 2300,- je Hotel an die Bank.") do |card, card_stack, player, other_players, playing_field|
       player.decrease_money(player.houses * 800 + player.hotels * 2300)
     end,
     Card.new("Arzt-Kosten. Zahle: DM 1000.-") do |card, card_stack, player, other_players, playing_field|
       player.decrease_money(1000)
     end,
-    Card.new("Du kommst aus dem Gefängnis frei. Diese Karte musst Du behalten, bis Du sie benötigst oder verkaufst.") do |card, card_stack, player, other_players, playing_field|
+    Card.new("Du kommst aus dem Gef\xC3\xA4ngnis frei. Diese Karte mu\xC3\x9ft Du behalten, bis Du sie ben\xC3\xB6tigst oder verkaufst.") do |card, card_stack, player, other_players, playing_field|
       player.add_jail_card(card, card_stack)
     end,
-    Card.new("Aus Lagerverkäufen erhälst Du: DM 500,-") do |card, card_stack, player, other_players, playing_field|
+    Card.new("Aus Lagerverk\xC3\xA4ufen erh\xC3\xA4lst Du: DM 500,-") do |card, card_stack, player, other_players, playing_field|
       player.raise_money(500)
     end,
     Card.new("Du erbst: DM 2000,-") do |card, card_stack, player, other_players, playing_field|
       player.raise_money(2000)
     end,
-    Card.new("Einkommensteuer-Rückzahlung. Ziehe DM 400,- ein.") do |card, card_stack, player, other_players, playing_field|
+    Card.new("Einkommensteuer-R\xC3\xBCckzahlung. Ziehe DM 400,- ein.") do |card, card_stack, player, other_players, playing_field|
       player.raise_money(400)
     end,
-    Card.new("Du erhälst auf Vorzugs-Aktien 7% Dividende: DM 900,-") do |card, card_stack, player, other_players, playing_field|
+    Card.new("Du erh\xC3\xA4lst auf Vorzugs-Aktien 7% Dividende: DM 900,-") do |card, card_stack, player, other_players, playing_field|
       player.raise_money(900)
     end,
-    Card.new("Rücke vor bis auf LOS.") do |card, card_stack, player, other_players, playing_field|
-      # goto field
+    Card.new("R\xC3\xBCcke vor bis auf LOS.") do |card, card_stack, player, other_players, playing_field|
+      playing_field.player_move_to(player, playing_field.field(1))
     end,
-    Card.new("Du hast in einem Kreuzworträtsel-Wettbewerb gewonnen. Ziehe DM 2000,- ein.") do |card, card_stack, player, other_players, playing_field|
+    Card.new("Du hast in einem Kreuzwortr\xC3\xA4tsel-Wettbewerb gewonnen. Ziehe DM 2000,- ein.") do |card, card_stack, player, other_players, playing_field|
       player.raise_money(2000)
     end,
     Card.new("Zahle an das Krankenhaus: DM 2000,-") do |card, card_stack, player, other_players, playing_field|
@@ -100,53 +100,53 @@ module Monopoly
   ])
   
   EventCards = CardStack.new([
-    Card.new("Rücke vor bis zur Schloßallee.") do |card, card_stack, player, other_players, playing_field|
-      # goto field
+    Card.new("R\xC3\xBCcke vor bis zur Schlo\xC3\x9fllee.") do |card, card_stack, player, other_players, playing_field|
+      playing_field.player_move_to(player, playing_field.field(40))
     end,
-    Card.new("Strafe für zu schnelles Fahren: DM 300,-") do |card, card_stack, player, other_players, playing_field|
+    Card.new("Strafe f\xC3\xBCr zu schnelles Fahren: DM 300,-") do |card, card_stack, player, other_players, playing_field|
       player.decrease_money(300)
     end,
-    Card.new("Rücke vor bis zum nächsten Bahnhof. Der Eigentümer erhält das Doppelte der normalen Miete. Hat noch kein Spieler einen Besitzanspruch auf diesen Bahnhof, so kannst Du ihn von der Bank kaufen.") do |card, card_stack, player, other_players, playing_field|
-      # goto field
+    Card.new("R\xC3\xBCcke vor bis zum n\xC3\xA4chsten Bahnhof. Der Eigent\xC3\xBCmer erh\xC3\xA4lt das Doppelte der normalen Miete. Hat noch kein Spieler einen Besitzanspruch auf diesen Bahnhof, so kannst Du ihn von der Bank kaufen.") do |card, card_stack, player, other_players, playing_field|
+      playing_field.player_move_to(player, playing_field.next_field_of_type(player, FieldStation))
     end,
-    Card.new("Gehe zurück zu Badstraße") do |card, card_stack, player, other_players, playing_field|
-      # goto field
+    Card.new("Gehe zur\xC3\xBCck zu Badstra\xC3\x9f") do |card, card_stack, player, other_players, playing_field|
+      playing_field.player_move_to(player, playing_field.field(2))
     end,
-    Card.new("Miete und Anleihezinsen werden fällig. Die Bank zahlt Dir DM 3000,-") do |card, card_stack, player, other_players, playing_field|
+    Card.new("Miete und Anleihezinsen werden f\xC3\xA4llig. Die Bank zahlt Dir DM 3000,-") do |card, card_stack, player, other_players, playing_field|
       player.raise_money(3000)
     end,
-    Card.new("Mache einen Ausflug zum Südbahnhof. Wenn du über LOS kommst, ziehe DM 4000,- ein.") do |card, card_stack, player, other_players, playing_field|
-      # goto field
+    Card.new("Mache einen Ausflug zum S\xC3\xBCdbahnhof. Wenn du \xC3\xBCber LOS kommst, ziehe DM 4000,- ein.") do |card, card_stack, player, other_players, playing_field|
+      playing_field.player_move_to(player, playing_field.field(6))
     end,
-    Card.new("Lasse alle Deine Häuser renovieren! Zahle an die Bank: Für jedes Haus DM 500,- Für jedes Hotel DM 2000,-") do |card, card_stack, player, other_players, playing_field|
+    Card.new("La\xC3\x9fe alle Deine H\xC3\xA4user renovieren! Zahle an die Bank: F\xC3\xBCr jedes Haus DM 500,- F\xC3\xBCr jedes Hotel DM 2000,-") do |card, card_stack, player, other_players, playing_field|
       player.decrease_money(player.houses * 500 + player.hotels * 2000)
     end,
-    Card.new("Gehe in das Gefängnis! Begib dich direkt dorthin. Gehe nicht über LOS. Ziehe nicht DM 4000,- ein.") do |card, card_stack, player, other_players, playing_field|
+    Card.new("Gehe in das Gef\xC3\xA4ngnis! Begib dich direkt dorthin. Gehe nicht \xC3\xBCber LOS. Ziehe nicht DM 4000,- ein.") do |card, card_stack, player, other_players, playing_field|
       player.add_jail_card(card, card_stack)
     end,
-    Card.new("Rücke vor bis zum Opernplatz. Wenn du über LOS kommst, ziehe DM 4000,- ein.") do |card, card_stack, player, other_players, playing_field|
-      # goto field
+    Card.new("R\xC3\xBCcke vor bis zum Opernplatz. Wenn du \xC3\xBCber LOS kommst, ziehe DM 4000,- ein.") do |card, card_stack, player, other_players, playing_field|
+      playing_field.player_move_to(player, playing_field.field(26))
     end,
-    Card.new("Rücke vor bis zur Seestraße. Wenn du über LOS kommst, ziehe DM 4000,- ein.") do |card, card_stack, player, other_players, playing_field|
-      # goto field
+    Card.new("R\xC3\xBCcke vor bis zur Seestra\xC3\x9f. Wenn du \xC3\xBCber LOS kommst, ziehe DM 4000,- ein.") do |card, card_stack, player, other_players, playing_field|
+      playing_field.player_move_to(player, playing_field.field(12))
     end,
-    Card.new("Gehe 3 Felder zurück.") do |card, card_stack, player, other_players, playing_field|
-      # goto field
+    Card.new("Gehe 3 Felder zur\xC3\xBCck.") do |card, card_stack, player, other_players, playing_field|
+      playing_field.player_move_dice_value(player, -3)
     end,
     Card.new("Die Bank Zahlt Dir eine Dividende: DM 1000,-") do |card, card_stack, player, other_players, playing_field|
       player.raise_money(1000)
     end,
-    Card.new("Du bist zum Vorstand gewählt worden. Zahle jedem Spieler DM 1000,-") do |card, card_stack, player, other_players, playing_field|
+    Card.new("Du bist zum Vorstand gew\xC3\xA4hlt worden. Zahle jedem Spieler DM 1000,-") do |card, card_stack, player, other_players, playing_field|
       player.raise_money(1000)
     end,
-    Card.new("Rücke vor bis auf LOS.") do |card, card_stack, player, other_players, playing_field|
-      # goto field
+    Card.new("R\xC3\xBCcke vor bis auf LOS.") do |card, card_stack, player, other_players, playing_field|
+      playing_field.player_move_to(player, playing_field.field(1))
     end,
     Card.new("Zahle eine Strafe von DM 200,- oder nimm eine Gemeinschaftskarte.") do |card, card_stack, player, other_players, playing_field|
-      player.decrease_money(300)
+      player.decrease_money(200)
       # FIXME choise
     end,
-    Card.new("Du kommst aus dem Gefängnis frei. Diese Karte musst Du behalten, bis Du sie benötigst oder verkaufst.") do |card, card_stack, player, other_players, playing_field|
+    Card.new("Du kommst aus dem Gef\xC3\xA4ngnis frei. Diese Karte mu\xC3\x9ft Du behalten, bis Du sie ben\xC3\xB6tigst oder verkaufst.") do |card, card_stack, player, other_players, playing_field|
       player.add_jail_card(card, card_stack)
     end
   ])

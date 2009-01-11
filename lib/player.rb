@@ -1,6 +1,7 @@
 module Monopoly
   class Player
-    attr_accessor :name, :money, :rolled_a_double, :current_field, :in_jail
+    attr_reader :name, :money
+    attr_accessor :rolled_a_double, :current_field, :in_jail
     
     def initialize(name, &actions)
       @name = name
@@ -18,9 +19,17 @@ module Monopoly
       end
     end
     
+    def do_auction(field, highest_offer)
+      500 # rand(500) # default
+    end
+    
     def do_jail(other_players)
       # nothing to do
       nil # default to dice
+    end
+    
+    def do_pay_sum(sum_left)
+      @streets.first.mortgage # default
     end
     
     def reset_rolled_a_double
@@ -49,18 +58,21 @@ module Monopoly
     end
     
     def find_streets(street_class)
-      @streets.select { |field| field.class = street_class }
+      @streets.select { |field| field.class == street_class }
     end
     
     def houses
-      find_streets(FieldStreet).inject(0) { |sum, field| sum += 1 if field.houses < Constructible::HOTEL }
+      find_streets(Fields::Street).inject(0) { |sum, field| sum += 1 if field.houses < Fields::Constructible::HOTEL }
     end
     
     def hotels
-      find_streets(FieldStreet).inject(0) { |sum, field| sum += 1 if field.houses == Constructible::HOTEL }
+      find_streets(Fields::Street).inject(0) { |sum, field| sum += 1 if field.houses == Fields::Constructible::HOTEL }
     end
     
     def decrease_money(amount)
+      while @money - amount < 0
+        do_pay_sum(@money - amount)
+      end
       @money -= amount
     end
     
@@ -103,4 +115,3 @@ module Monopoly
     end
   end
 end
-  
