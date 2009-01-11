@@ -17,6 +17,10 @@ module Monopoly
       def mortgage?
         @mortgage
       end
+      
+      def value
+        price
+      end
 
       def buyable?
         @owner.nil?
@@ -115,8 +119,11 @@ module Monopoly
       end
 
       def all_streets_of_a_kind_without_mortgage?
-        no_mortgage = true
-        fields_of_kind.each { |field| no_mortgage &= false if field.mortgage? }
+        return false unless all_streets_of_a_kind?
+        fields_of_kind.each do |field| 
+          return false if field.mortgage? 
+        end
+        true
       end
 
       def other_fields_houses
@@ -174,6 +181,10 @@ module Monopoly
         else
           false
         end
+      end
+      
+      def value
+        price + houses * @charge_house
       end
 
       def charge
