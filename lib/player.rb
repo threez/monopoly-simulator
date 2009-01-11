@@ -12,6 +12,10 @@ module Monopoly
       @in_jail = false
     end
     
+    def value
+      money + streets.inject(0) { |sum, street| sum += street.value }
+    end
+    
     def do_actions(other_players, type = :normal)
       if type == :normal and 
          current_field.respond_to? "buyable?" and 
@@ -63,10 +67,17 @@ module Monopoly
     end
     
     def can_build_house?
+      find_buildable_streets().size > 0
+    end
+    
+    def find_buildable_streets()
+      buildable_streets = []
       streets.each do |street|
-        return true if street.class == Fields::Street and street.all_streets_of_a_kind?
+        if street.class == Fields::Street and street.house_buyable?
+          buildable_streets << street
+        end
       end
-      return false
+      buildable_streets.sort { |y, x| x.color.to_s <=> y.color.to_s }
     end
     
     def houses
