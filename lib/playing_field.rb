@@ -117,7 +117,11 @@ module Monopoly
     def next_field_of_type(player, field_class)
       current_position = @player_positions[player]
       begin
-        current_position += 1
+        if @playing_field.size == current_position + 1
+          current_position = 0
+        else
+          current_position += 1
+        end
       end while @playing_field[current_position].class != field_class
       return @playing_field[current_position]
     end

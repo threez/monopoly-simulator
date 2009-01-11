@@ -1,5 +1,6 @@
+require File.dirname(__FILE__) + "/logger"
+
 module Monopoly
-  
   class Card
     def initialize(description, &block)
       @description = description
@@ -8,13 +9,17 @@ module Monopoly
     
     def use(card_stack, player, other_players, playing_field)
       if @block # if card implemented
+        logger.player_info(player, "#{card_stack.name.upcase}: " + @description)
         @block.call(self, card_stack, player, other_players, playing_field)
       end
     end
   end
   
   class CardStack
-    def initialize(cards)
+    attr_reader :name
+    
+    def initialize(name, cards)
+      @name = name
       @cards = cards
       @iteration = 0
       shuffle_cards!
@@ -48,7 +53,7 @@ module Monopoly
     end
   end
   
-  CommunityCards = CardStack.new([
+  CommunityCards = CardStack.new("Gemeinschaftskarte", [
     Card.new("Es ist dein Geburtstag. Ziehe von jedem Spieler DM 1000,- ein.") do |card, card_stack, player, other_players, playing_field|  
       other_players.each { |player| player.transfer_money_to(player, 1000) }
     end,
@@ -68,7 +73,7 @@ module Monopoly
       player.raise_money(4000)
     end,
     Card.new("Du wirst zu Stra\xC3\x9fnausbe\xC3\x9ferungsarbeiten herangezogen. Zahle f\xC3\xBCr Deine H\xC3\xA4user und Hotels DM 800,- je Haus DM 2300,- je Hotel an die Bank.") do |card, card_stack, player, other_players, playing_field|
-      player.decrease_money(player.houses * 800 + player.hotels * 2300)
+      player.decrease_money(800 * player.houses + 2300 * player.hotels)
     end,
     Card.new("Arzt-Kosten. Zahle: DM 1000.-") do |card, card_stack, player, other_players, playing_field|
       player.decrease_money(1000)
@@ -99,7 +104,7 @@ module Monopoly
     end
   ])
   
-  EventCards = CardStack.new([
+  EventCards = CardStack.new("Ereigniskarte", [
     Card.new("R\xC3\xBCcke vor bis zur Schlo\xC3\x9fllee.") do |card, card_stack, player, other_players, playing_field|
       playing_field.player_move_to(player, playing_field.field(40))
     end,
@@ -119,7 +124,7 @@ module Monopoly
       playing_field.player_move_to(player, playing_field.field(6))
     end,
     Card.new("La\xC3\x9fe alle Deine H\xC3\xA4user renovieren! Zahle an die Bank: F\xC3\xBCr jedes Haus DM 500,- F\xC3\xBCr jedes Hotel DM 2000,-") do |card, card_stack, player, other_players, playing_field|
-      player.decrease_money(player.houses * 500 + player.hotels * 2000)
+      player.decrease_money(500 * player.houses + 2000 * player.hotels)
     end,
     Card.new("Gehe in das Gef\xC3\xA4ngnis! Begib dich direkt dorthin. Gehe nicht \xC3\xBCber LOS. Ziehe nicht DM 4000,- ein.") do |card, card_stack, player, other_players, playing_field|
       player.add_jail_card(card, card_stack)
