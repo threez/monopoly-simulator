@@ -22,8 +22,8 @@ module Monopoly
         @owner.nil?
       end
 
-      def player_has_to_pay?
-        !buyable? and !@owner.in_jail
+      def player_has_to_pay?(player)
+        !buyable? and !@owner.in_jail and player != @owner and !@owner.in_jail
       end
 
       def owner=(player)
@@ -43,6 +43,7 @@ module Monopoly
             player.decrease_money price_of_field
             player.add_street(self)
             self.owner = player
+            logger.player_info(player, "buyed #{name} for #{price_of_field} (normal price: #{price})")
             true
           else
             false
@@ -51,13 +52,21 @@ module Monopoly
           false
         end
       end
+      
+      def sellable?
+        true
+      end
 
       def sell
-
+        if sellable?
+          @owner.streets.remove_street(self)
+          @woner.raise_money(price)
+          @owner = nil
+        end
       end
 
       def sell_to_player(player)
-
+        # FIXME
       end
 
       def fields_of_same_kind()
@@ -65,8 +74,9 @@ module Monopoly
       end
 
       def enter_field(player, playing_field)
-        if player_has_to_pay?
-          player.decrease_money(self.charge)
+        if player_has_to_pay?(player)
+          player.transfer_money_to(@owner, self.charge)
+          logger.player_info(player, "pay charge to #{@owner.name} (#{self.charge})")
         end
       end
     end
@@ -120,7 +130,7 @@ module Monopoly
 
       def house_buyable?
         if all_streets_of_a_kind_without_mortgage? and more_houses_possible?
-          if other_fields_houses >= @houses * 2
+          if other_fields_houses >= @houses * (@count_of_kind.size - 1)
             true
           else
             false
@@ -129,10 +139,14 @@ module Monopoly
           false
         end
       end
+      
+      def sellable?
+        !house_sellable?
+      end
 
-      def house_sellable
+      def house_sellable?
         if @houses > 0
-          if other_fields_houses <= @houses * 2
+          if other_fields_houses <= @houses * (@count_of_kind.size - 1)
             true
           else
             false
@@ -189,23 +203,35 @@ module Monopoly
         false
       end
     end
+    
+    class Field
+      def name
+        if @name
+          @name
+        else
+          self.class
+        end
+      end
+    end
 
-    class Go
+    class Go < Field
       include NotBuyable
 
       def enter_field(player, playing_field)
+        logger.player_info(player, "entered go field, raised 8000 (#{player.money})")
         player.raise_money 8000
       end
 
       def pass_field(player, playing_field)
+        logger.player_info(player, "passed go field, raised 4000 (#{player.money})")
         player.raise_money 4000
       end
     end
 
-    class Street
+    class Street < Field
       include Constructible
 
-      attr_accessor :color, :name, :count_of_kind
+      attr_accessor :color, :count_of_kind
 
       def initialize(color, name, price, charge, charge_house)
         @color = color
@@ -223,7 +249,7 @@ module Monopoly
       end
     end
 
-    class Station
+    class Station < Field
       include Buyable
 
       def price
@@ -250,10 +276,8 @@ module Monopoly
       end
     end
 
-    class Plant
+    class Plant < Field
       include Buyable
-
-      attr_accessor :name
 
       def initialize(name)
         @name = name
@@ -264,19 +288,19 @@ module Monopoly
       end
 
       def enter_field(player, playing_field)
-        if player_has_to_pay?
+        if player_has_to_pay?(player)
           charge = if fields_of_same_kind.size == 1
                      80 * playing_field.dices_value
                    else
                      200 * playing_field.dices_value
                    end
 
-          player.decrease_money charge
+          player.transfer_money_to(@owner, charge)
         end
       end
     end
 
-    class Community
+    class Community < Field
       include NotBuyable
 
       def enter_field(player, playing_field)
@@ -285,7 +309,7 @@ module Monopoly
       end
     end
 
-    class Event
+    class Event < Field
       include NotBuyable
 
       def enter_field(player, playing_field)
@@ -294,9 +318,9 @@ module Monopoly
       end
     end
 
-    class Tax
+    class Tax < Field
       include NotBuyable
-      attr_accessor :name, :price
+      attr_accessor :price
 
       def initialize(name, price)
         @name = name
@@ -308,7 +332,7 @@ module Monopoly
       end
     end
 
-    class Jail
+    class Jail < Field
       include NotBuyable
 
       attr_accessor :prisoners
@@ -323,7 +347,8 @@ module Monopoly
       end
     
       def leave(prisoner)
-        @field_jail.delete prisoner
+        @prisoners.delete prisoner
+        prisoner.in_jail = false
       end
     
       def is_prisoner?(prisoner)
@@ -335,15 +360,11 @@ module Monopoly
       end
     end
 
-    class Parking
+    class Parking < Field
       include NotBuyable
-
-      def enter_field(player, playing_field)
-        # do nothing
-      end
     end
 
-    class GoJail
+    class GoJail < Field
       include NotBuyable
 
       def enter_field(player, playing_field)

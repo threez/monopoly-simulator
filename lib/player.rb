@@ -3,9 +3,8 @@ module Monopoly
     attr_reader :name, :money
     attr_accessor :rolled_a_double, :current_field, :in_jail
     
-    def initialize(name, &actions)
+    def initialize(name)
       @name = name
-      @actions = actions
       @streets = []
       @money = 30000
       @jail_cards = []
@@ -13,14 +12,11 @@ module Monopoly
       @in_jail = false
     end
     
-    def do_actions(other_players)
-      if @actions 
-        @actions.call(self, other_players)
-      end
+    def do_actions(other_players, type = :normal)
     end
     
     def do_auction(field, highest_offer)
-      500 # rand(500) # default
+      rand(500) + rand(500) # default
     end
     
     def do_jail(other_players)
@@ -61,6 +57,13 @@ module Monopoly
       @streets.select { |field| field.class == street_class }
     end
     
+    def can_build_house?
+      streets.each do |street|
+        return true if street.class == Fields::Street and street.all_streets_of_a_kind?
+      end
+      return false
+    end
+    
     def houses
       find_streets(Fields::Street).inject(0) do |sum, field| 
         sum += 1 if field.houses > 0 and field.houses < Fields::Constructible::HOTEL
@@ -78,10 +81,12 @@ module Monopoly
         do_pay_sum(@money - amount)
       end
       @money -= amount
+      logger.player_info(self, "payed #{amount} (#{@money})")
     end
     
     def raise_money(amount)
       @money += amount
+      logger.player_info(self, "raised #{amount} (#{@money})")
     end
     
     def add_jail_card(card, card_stack)
@@ -89,7 +94,7 @@ module Monopoly
     end
     
     def has_jail_card?
-      @jail_cards > @jail_cards.size
+      @jail_cards.size > 0
     end
     
     def use_jail_card
