@@ -101,7 +101,7 @@ module Monopoly
       end
       
       def houses
-        @houses
+        @houses ||= 0
       end
 
       def fields_of_kind

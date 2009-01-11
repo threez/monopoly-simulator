@@ -65,14 +65,14 @@ module Monopoly
     end
     
     def houses
-      find_streets(Fields::Street).inject(0) do |sum, field| 
-        sum += 1 if field.houses > 0 and field.houses < Fields::Constructible::HOTEL
+      find_streets(Fields::Street).inject(0) do |sum, street| 
+        sum += 1 if street.houses > 0 and street.houses < Fields::Constructible::HOTEL
       end.to_i
     end
     
     def hotels
-      find_streets(Fields::Street).inject(0) do |sum, field|
-        sum += 1 if field.houses == Fields::Constructible::HOTEL
+      find_streets(Fields::Street).inject(0) do |sum, street|
+        sum += 1 if street.houses == Fields::Constructible::HOTEL
       end.to_i
     end
     
