@@ -142,7 +142,7 @@ module Monopoly
       player.raise_money(1000)
     end,
     Card.new("Du bist zum Vorstand gew\xC3\xA4hlt worden. Zahle jedem Spieler DM 1000,-") do |card, card_stack, player, other_players, playing_field|
-      other_players.each { |opter_player| player.transfer_money_to(other_player, 1000)}
+      other_players.each { |other_player| player.transfer_money_to(other_player, 1000)}
     end,
     Card.new("R\xC3\xBCcke vor bis auf LOS.") do |card, card_stack, player, other_players, playing_field|
       playing_field.player_move_to(player, playing_field.field(1))
