@@ -92,7 +92,7 @@ module Monopoly
 
       def mortgage
         unless houses?
-          super.mortgage
+          super
         end
       end
 
