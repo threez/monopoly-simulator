@@ -91,6 +91,7 @@ module Monopoly
 
     module Constructible
       include Buyable
+      
       NO_HOUSE = 0
       HOTEL = 5
 
@@ -208,6 +209,10 @@ module Monopoly
     end
     
     class Field
+      def initialize(name)
+        @name = name
+      end
+      
       def name
         if @name
           @name
@@ -237,8 +242,8 @@ module Monopoly
       attr_accessor :color, :count_of_kind
 
       def initialize(color, name, price, charge, charge_house)
+        super(name)
         @color = color
-        @name = name
         @price = price
 
         # for constructible
@@ -250,10 +255,11 @@ module Monopoly
 
     class Station < Field
       include Buyable
+      
       CHARGE = { 1 => 500, 2 => 1000, 3 => 2000, 4 => 4000 }
 
       def initialize(name)
-        @name = name
+        super(name)
         @price = 4000
       end
 
@@ -266,7 +272,7 @@ module Monopoly
       include Buyable
 
       def initialize(name)
-        @name = name
+        super(name)
         @price = 3000
       end
 
@@ -282,25 +288,22 @@ module Monopoly
     class CardField < Field
       include NotBuyable
       
+      def initialize(card_stack)
+        super(card_stack.name)
+        @card_stack = card_stack
+      end
+      
       def enter_field(player, playing_field)
         card = CommunityCards.next_card
-        card.use(card_stack, player, playing_field.other_players(player), playing_field)
+        card.use(@card_stack, player, playing_field.other_players(player), playing_field)
       end
-    end
-
-    class Community < CardField
-      def card_stack; CommunityCards; end
-    end
-
-    class Event < CardField
-      def card_stack; EventCards; end
     end
 
     class Tax < Field
       include NotBuyable
 
       def initialize(name, price)
-        @name = name
+        super(name)
         @price = price
       end
 
@@ -314,7 +317,8 @@ module Monopoly
 
       attr_accessor :prisoners
 
-      def initialize()
+      def initialize(name)
+        super(name)
         @prisoners = []
       end
     
@@ -343,7 +347,7 @@ module Monopoly
 
     class GoJail < Field
       include NotBuyable
-
+      
       def enter_field(player, playing_field)
         playing_field.go_to_jail player
       end

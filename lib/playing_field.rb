@@ -12,33 +12,33 @@ module Monopoly
       
       @playing_field = [
         # site 1
-        Go.new(),
+        Go.new("LOS"),
         Street.new(:pink, "Badstra\xC3\x9fe", 1200, { 0 => 40, 1 => 200, 2 => 600, 3 => 1800, 4 => 3200, 5 => 5000 }, 1000),
-        Community.new(),
+        CardField.new(CommunityCards),
         Street.new(:pink, "Turmstra\xC3\x9fe", 1200, { 0 => 80, 1 => 400, 2 => 1200, 3 => 3600, 4 => 6400, 5 => 9000 }, 1000),
         Tax.new("Einkommensteuer", 4000),
         Station.new("S\xC3\xBCdbahnhof"),
         Street.new(:cyan, "Chausseestra\xC3\x9fe", 2000, { 0 => 120, 1 => 600, 2 => 1800, 3 => 5400, 4 => 8000, 5 => 11000 }, 1000),
-        Event.new(),
+        CardField.new(EventCards),
         Street.new(:cyan, "Elisenstra\xC3\x9fe", 2000, { 0 => 120, 1 => 600, 2 => 1800, 3 => 5400, 4 => 8000, 5 => 11000 }, 1000),
         Street.new(:cyan, "Poststra\xC3\x9fe", 2400, { 0 => 160, 1 => 800, 2 => 2000, 3 => 6000, 4 => 9000, 5 => 12000 }, 1000),
 
         # site 2
-        Jail.new(),
+        Jail.new("Gef\xC3\xA4ngnis"),
         Street.new(:purple, "Seestra\xC3\x9fe", 2800, { 0 => 200, 1 => 1000, 2 => 3000, 3 => 9000, 4 => 12500, 5 => 15000 }, 2000),
         Plant.new("Elektrizit\xC3\xA4ts-Werk"),
         Street.new(:purple, "Hafenstra\xC3\x9fe", 2800, { 0 => 200, 1 => 1000, 2 => 3000, 3 => 9000, 4 => 12500, 5 => 15000 }, 2000),
         Street.new(:purple, "Neue Stra\xC3\x9fe", 3200, { 0 => 240, 1 => 1200, 2 => 3600, 3 => 10000, 4 => 14000, 5 => 18000 }, 2000),
         Station.new("Westbahnhof"),
         Street.new(:orange, "M\xC3\xBCnchener Stra\xC3\x9fe", 3600, { 0 => 280, 1 => 1400, 2 => 4000, 3 => 11000, 4 => 15000, 5 => 19000 }, 2000),
-        Community.new(),
+        CardField.new(CommunityCards),
         Street.new(:orange, "Wiener Stra\xC3\x9fe", 3600, { 0 => 280, 1 => 1400, 2 => 4000, 3 => 11000, 4 => 15000, 5 => 19000 }, 2000),
         Street.new(:orange, "Berliner Stra\xC3\x9fe", 4000, { 0 => 320, 1 => 1600, 2 => 4400, 3 => 12000, 4 => 16000, 5 => 20000 }, 2000),
 
         # site 3
-        Parking.new(),
+        Parking.new("Frei Parken"),
         Street.new(:red, "Theaterstra\xC3\x9fe", 4400, { 0 => 360, 1 => 1800, 2 => 5000, 3 => 14000, 4 => 17500, 5 => 21000 }, 3000),
-        Event.new(),
+        CardField.new(EventCards),
         Street.new(:red, "Museumstra\xC3\x9fe", 4400, { 0 => 360, 1 => 1800, 2 => 5000, 3 => 14000, 4 => 17500, 5 => 21000 }, 3000),
         Street.new(:red, "Opernplatz", 4800, { 0 => 400, 1 => 2000, 2 => 6000, 3 => 15000, 4 => 18500, 5 => 23000 }, 3000),
         Station.new("Nordbahnhof"),
@@ -48,13 +48,13 @@ module Monopoly
         Street.new(:yellow, "Goethestra\xC3\x9fe", 5600, { 0 => 480, 1 => 2400, 2 => 7200, 3 => 17000, 4 => 20500, 5 => 24000 }, 3000),
 
         # site 4
-        GoJail.new(),
+        GoJail.new("Gehe ins Gef\xC3\xA4ngnis"),
         Street.new(:green, "Rathausplatz", 6000, { 0 => 520, 1 => 2600, 2 => 7800, 3 => 18000, 4 => 22000, 5 => 25500 }, 4000),
         Street.new(:green, "Hauptstra\xC3\x9fe", 6000, { 0 => 520, 1 => 2600, 2 => 7800, 3 => 18000, 4 => 22000, 5 => 25500 }, 4000),
-        Community.new(),
+        CardField.new(CommunityCards),
         Street.new(:green, "Bahnhofstra\xC3\x9fe", 6400, { 0 => 560, 1 => 3000, 2 => 9000, 3 => 20000, 4 => 24000, 5 => 28000 }, 4000),
         Station.new("Hauptbahnhof"),
-        Event.new(),
+        CardField.new(EventCards),
         Street.new(:blue, "Parkstra\xC3\x9fe", 7000, { 0 => 700, 1 => 3500, 2 => 10000, 3 => 22000, 4 => 26000, 5 => 30000 }, 4000),
         Tax.new("Zusatzsteuer", 2000),
         Street.new(:blue, "Schlo\xC3\x9fallee", 8000, { 0 => 1000, 1 => 4000, 2 => 12000, 3 => 28000, 4 => 34000, 5 => 40000 }, 4000)
