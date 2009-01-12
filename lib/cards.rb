@@ -55,7 +55,7 @@ module Monopoly
   
   CommunityCards = CardStack.new("Gemeinschaftskarte", [
     Card.new("Es ist dein Geburtstag. Ziehe von jedem Spieler DM 1000,- ein.") do |card, card_stack, player, other_players, playing_field|  
-      other_players.each { |player| player.transfer_money_to(player, 1000) }
+      other_players.each { |tmpplayer| tmpplayer.transfer_money_to(player, 1000) }
     end,
     Card.new("Gehe in das Gef\xC3\xA4ngnis! Begib Dich direkt dorthin. Gehe nicht \xC3\xBCber LOS. Ziehe nicht DM 4000,- ein.") do |card, card_stack, player, other_players, playing_field|
       playing_field.go_to_jail(player)
