@@ -272,12 +272,8 @@ module Monopoly
 
       def enter_field(player, playing_field)
         if player_has_to_pay?(player)
-          charge = if fields_of_same_kind.size == 1
-                     80 * playing_field.dices_value
-                   else
-                     200 * playing_field.dices_value
-                   end
-
+          multiplyer = (fields_of_same_kind.size == 1) ? 80 : 200
+          charge = multiplyer * playing_field.dices_value
           player.transfer_money_to(@owner, charge)
         end
       end
@@ -303,7 +299,6 @@ module Monopoly
 
     class Tax < Field
       include NotBuyable
-      attr_accessor :price
 
       def initialize(name, price)
         @name = name
