@@ -92,10 +92,6 @@ module Monopoly
     module Constructible
       include Buyable
       NO_HOUSE = 0
-      HOUSE_1 = 1
-      HOUSE_2 = 2
-      HOUSE_3 = 3
-      HOUSE_4 = 4
       HOTEL = 5
 
       def mortgage
@@ -199,16 +195,8 @@ module Monopoly
             else
               @charge[0]
             end
-          when HOUSE_1
-            @charge[1]
-          when HOUSE_2
-            @charge[2]
-          when HOUSE_3
-            @charge[3]
-          when HOUSE_4
-            @charge[4]
-          when HOTEL
-            @charge[5]
+          else
+            @charge[@houses]
         end
       end
     end
