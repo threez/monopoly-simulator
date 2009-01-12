@@ -262,6 +262,8 @@ module Monopoly
 
     class Station < Field
       include Buyable
+      
+      CHARGE = { 1 => 500, 2 => 1000, 3 => 2000, 4 => 4000}
 
       def price
         4000
@@ -274,16 +276,7 @@ module Monopoly
       end
 
       def charge
-        case fields_of_same_kind.size
-          when 1
-            500
-          when 2
-            1000
-          when 3
-            2000
-          when 4
-            4000 
-        end 
+        CHARGE[fields_of_same_kind.size]
       end
     end
 
