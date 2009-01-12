@@ -8,6 +8,10 @@ module Monopoly
         @mortgage = true
         @interest = 1.10  # 10% interest
       end
+      
+      def price
+        @price
+      end
 
       def amortize_the_mortgage()
         @owner.decrease_money(price / 2 * @interest)
@@ -262,17 +266,11 @@ module Monopoly
 
     class Station < Field
       include Buyable
-      
       CHARGE = { 1 => 500, 2 => 1000, 3 => 2000, 4 => 4000}
-
-      def price
-        4000
-      end
-
-      attr_accessor :name
 
       def initialize(name)
         @name = name
+        @price = 4000
       end
 
       def charge
@@ -285,10 +283,7 @@ module Monopoly
 
       def initialize(name)
         @name = name
-      end
-
-      def price 
-        3000
+        @price = 3000
       end
 
       def enter_field(player, playing_field)
