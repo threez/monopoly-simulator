@@ -43,7 +43,7 @@ module Monopoly
     def do_actions(other_players, type = :normal)
       if type == :normal
         header
-        puts " press [b] to buy street" if current_field.respond_to? "buyable?" and current_street.buyable?
+        puts " press [b] to buy street" if current_street.buyable?
         puts " press [s] to sell street" if streets.size > 0
         puts " press [h] to build house" if can_build_house?
         puts " press [d] to destroy house" if houses > 0 or hotels > 0

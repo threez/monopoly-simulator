@@ -17,9 +17,7 @@ module Monopoly
     end
     
     def do_actions(other_players, type = :normal)
-      if type == :normal and 
-         current_field.respond_to? "buyable?" and 
-         current_field.buyable?
+      if type == :normal and current_field.buyable?
         current_field.buy(self) if current_field.price < money
       end
     end

@@ -119,7 +119,7 @@ module Monopoly
       # hook for player actions
       player.do_actions(other_players(player))
 
-      if player.current_field.respond_to? "buyable?" and player.current_field.buyable? 
+      if player.current_field.buyable? 
         handle_auction_with(player.current_field, @players)
       end
     end
