@@ -199,7 +199,7 @@ module Monopoly
       if player_in_jail?(player)
         case player.do_jail(other_players(player)) 
           when :pay
-            leave_jail(player) if player.decrease_money 1000
+            leave_jail(player) if player.transfer_money_to(:bank, 1000)
           when :use_card
             leave_jail(player) if player.has_jail_card?
           else

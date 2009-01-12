@@ -14,7 +14,7 @@ module Monopoly
       end
 
       def amortize_the_mortgage()
-        @owner.decrease_money(price / 2 * @interest)
+        @owner.transfer_money_to(:bank, price / 2 * @interest)
         @mortgage = false
       end
 
@@ -48,7 +48,7 @@ module Monopoly
 
         if buyable?
           if player.money >= price_of_field
-            player.decrease_money price_of_field
+            player.transfer_money_to(:bank, price_of_field)
             player.add_street(self)
             self.owner = player
             logger.player_info(player, "buyed #{name} for #{price_of_field} (normal price: #{price})")
@@ -166,7 +166,7 @@ module Monopoly
 
       def buy_house
         if house_buyable?
-          @owner.decrease_money @charge_house
+          @owner.transfer_money_to(:bank, @charge_house)
           @houses += 1
           true
         else
@@ -176,7 +176,7 @@ module Monopoly
 
       def sell_house
         if house_sellable?
-          @owner.increase_money @charge_house
+          @owner.raise_money @charge_house
           @houses -= 1
           true
         else
@@ -308,7 +308,7 @@ module Monopoly
       end
 
       def enter_field(player, playing_field)
-        player.decrease_money @price
+        player.transfer_money_to(:bank, @price)
       end
     end
 

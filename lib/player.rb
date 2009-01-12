@@ -90,19 +90,6 @@ module Monopoly
       end.to_i
     end
     
-    def decrease_money(amount)
-      while @money - amount < 0
-        do_pay_sum(@money - amount)
-      end
-      @money -= amount
-      logger.player_info(self, "payed #{amount} (#{@money})")
-    end
-    
-    def raise_money(amount)
-      @money += amount
-      logger.player_info(self, "raised #{amount} (#{@money})")
-    end
-    
     def add_jail_card(card, card_stack)
       @jail_cards << [card, card_stack]
     end
@@ -121,9 +108,14 @@ module Monopoly
       end
     end
     
-    def transfer_money_to(player, amount)
-      player.raise_money(amount)
-      self.decrease_money(amount)
+    def transfer_money_to(receiver, amount)
+      if receiver != :bank
+        receiver.raise_money(amount)
+        logger.player_info(self, "transfer #{amount} from [#{self.name}] to [#{receiver.name}]")
+      else  
+        logger.player_info(self, "transfer #{amount} from [#{self.name}] to [bank]")
+      end
+      decrease_money(amount)
     end
     
     def sell_jail_card(player, price)
@@ -135,6 +127,19 @@ module Monopoly
         card, card_stack = @jail_cards.shift
         player.add_jail_card(card, card_stack)
       end
+    end
+
+    def raise_money(amount)
+      @money += amount
+    end
+    
+  private 
+    
+    def decrease_money(amount)
+      while @money - amount < 0
+        do_pay_sum(@money - amount)
+      end
+      @money -= amount
     end
   end
 end

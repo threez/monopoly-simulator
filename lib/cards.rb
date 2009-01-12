@@ -61,7 +61,7 @@ module Monopoly
       playing_field.go_to_jail(player)
     end,
     Card.new("Zahle Schulgeld: DM 3000,-") do |card, card_stack, player, other_players, playing_field|
-      player.decrease_money(3000)
+      player.transfer_money_to(:bank, 3000)
     end,
     Card.new("Die Jahresrente wird f\xC3\xA4llig. Ziehe DM 2000,- ein.") do |card, card_stack, player, other_players, playing_field|
       player.raise_money(2000)
@@ -73,10 +73,10 @@ module Monopoly
       player.raise_money(4000)
     end,
     Card.new("Du wirst zu Stra\xC3\x9fenausbesserungsarbeiten herangezogen. Zahle f\xC3\xBCr Deine H\xC3\xA4user und Hotels DM 800,- je Haus DM 2300,- je Hotel an die Bank.") do |card, card_stack, player, other_players, playing_field|
-      player.decrease_money(800 * player.houses + 2300 * player.hotels)
+      player.transfer_money_to(:bank, 800 * player.houses + 2300 * player.hotels)
     end,
     Card.new("Arzt-Kosten. Zahle: DM 1000.-") do |card, card_stack, player, other_players, playing_field|
-      player.decrease_money(1000)
+      player.transfer_money_to(:bank, 1000)
     end,
     Card.new("Du kommst aus dem Gef\xC3\xA4ngnis frei. Diese Karte musst Du behalten, bis Du sie ben\xC3\xB6tigst oder verkaufst.") do |card, card_stack, player, other_players, playing_field|
       player.add_jail_card(card, card_stack)
@@ -100,7 +100,7 @@ module Monopoly
       player.raise_money(2000)
     end,
     Card.new("Zahle an das Krankenhaus: DM 2000,-") do |card, card_stack, player, other_players, playing_field|
-      player.decrease_money(2000)
+      player.transfer_money_to(:bank, 2000)
     end
   ])
   
@@ -109,7 +109,7 @@ module Monopoly
       playing_field.player_move_to(player, playing_field.field(40))
     end,
     Card.new("Strafe f\xC3\xBCr zu schnelles Fahren: DM 300,-") do |card, card_stack, player, other_players, playing_field|
-      player.decrease_money(300)
+      player.transfer_money_to(:bank, 300)
     end,
     Card.new("R\xC3\xBCcke vor bis zum n\xC3\xA4chsten Bahnhof. Der Eigent\xC3\xBCmer erh\xC3\xA4lt das Doppelte der normalen Miete. Hat noch kein Spieler einen Besitzanspruch auf diesen Bahnhof, so kannst Du ihn von der Bank kaufen.") do |card, card_stack, player, other_players, playing_field|
       playing_field.player_move_to(player, playing_field.next_field_of_type(player, Fields::Station))
@@ -124,7 +124,7 @@ module Monopoly
       playing_field.player_move_to(player, playing_field.field(6))
     end,
     Card.new("Lasse alle Deine H\xC3\xA4user renovieren! Zahle an die Bank: F\xC3\xBCr jedes Haus DM 500,- F\xC3\xBCr jedes Hotel DM 2000,-") do |card, card_stack, player, other_players, playing_field|
-      player.decrease_money(500 * player.houses + 2000 * player.hotels)
+      player.transfer_money_to(:bank, 500 * player.houses + 2000 * player.hotels)
     end,
     Card.new("Gehe in das Gef\xC3\xA4ngnis! Begib dich direkt dorthin. Gehe nicht \xC3\xBCber LOS. Ziehe nicht DM 4000,- ein.") do |card, card_stack, player, other_players, playing_field|
       playing_field.go_to_jail(player)
@@ -148,7 +148,7 @@ module Monopoly
       playing_field.player_move_to(player, playing_field.field(1))
     end,
     Card.new("Zahle eine Strafe von DM 200,- oder nimm eine Gemeinschaftskarte.") do |card, card_stack, player, other_players, playing_field|
-      player.decrease_money(200)
+      player.transfer_money_to(:bank, 200)
       # FIXME choise
     end,
     Card.new("Du kommst aus dem Gef\xC3\xA4ngnis frei. Diese Karte musst Du behalten, bis Du sie ben\xC3\xB6tigst oder verkaufst.") do |card, card_stack, player, other_players, playing_field|
