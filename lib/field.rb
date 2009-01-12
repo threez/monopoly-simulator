@@ -250,7 +250,7 @@ module Monopoly
 
     class Station < Field
       include Buyable
-      CHARGE = { 1 => 500, 2 => 1000, 3 => 2000, 4 => 4000}
+      CHARGE = { 1 => 500, 2 => 1000, 3 => 2000, 4 => 4000 }
 
       def initialize(name)
         @name = name
@@ -278,23 +278,22 @@ module Monopoly
         end
       end
     end
-
-    class Community < Field
+    
+    class CardField < Field
       include NotBuyable
-
+      
       def enter_field(player, playing_field)
         card = CommunityCards.next_card
-        card.use(CommunityCards, player, playing_field.other_players(player), playing_field)
+        card.use(card_stack, player, playing_field.other_players(player), playing_field)
       end
     end
 
-    class Event < Field
-      include NotBuyable
+    class Community < CardField
+      def card_stack; CommunityCards; end
+    end
 
-      def enter_field(player, playing_field)
-        card = EventCards.next_card
-        card.use(EventCards, player, playing_field.other_players(player), playing_field)
-      end
+    class Event < CardField
+      def card_stack; EventCards; end
     end
 
     class Tax < Field
