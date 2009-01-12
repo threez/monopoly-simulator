@@ -258,10 +258,6 @@ module Monopoly
         @charge_house = charge_house
         @houses = 0
       end
-
-      def price
-        @price
-      end
     end
 
     class Station < Field
