@@ -1,44 +1,5 @@
 module Monopoly
-  class Player
-    attr_reader :name, :money
-    attr_accessor :rolled_a_double, :current_field, :in_jail
-    
-    def initialize(name)
-      @name = name
-      @streets = []
-      @money = 30000
-      @jail_cards = []
-      @rolled_a_double = 0
-      @in_jail = false
-    end
-    
-    def value
-      money + streets.inject(0) { |sum, street| sum += street.value }
-    end
-    
-    def do_actions(other_players, type = :normal)
-      if type == :normal and current_field.buyable?
-        current_field.buy(self) if current_field.price < money
-      end
-    end
-    
-    def do_auction(field, highest_offer)
-      rand(500) + rand(500) # default
-    end
-    
-    def do_jail(other_players)
-      # nothing to do
-      nil # default to dice
-    end
-    
-    def do_pay_sum(sum_left)
-      @streets.first.mortgage # default
-    end
-    
-    def reset_rolled_a_double
-      @rolled_a_double = 0
-    end
-    
+  module HasStreets
     def streets
       @streets
     end
@@ -63,7 +24,9 @@ module Monopoly
     def find_streets(street_class)
       @streets.select { |field| field.class == street_class }
     end
-    
+  end
+  
+  module HasStreetsWithHouses
     def can_build_house?
       find_buildable_streets().size > 0
     end
@@ -89,7 +52,9 @@ module Monopoly
         sum += 1 if street.houses == Fields::Constructible::HOTEL
       end.to_i
     end
-    
+  end
+  
+  module HasJailCards
     def add_jail_card(card, card_stack)
       @jail_cards << [card, card_stack]
     end
@@ -108,16 +73,6 @@ module Monopoly
       end
     end
     
-    def transfer_money_to(receiver, amount)
-      if receiver != :bank
-        receiver.raise_money(amount)
-        logger.player_info(self, "transfer #{amount} from [#{self.name}] to [#{receiver.name}]")
-      else  
-        logger.player_info(self, "transfer #{amount} from [#{self.name}] to [bank]")
-      end
-      decrease_money(amount)
-    end
-    
     def sell_jail_card(player, price)
       if has_jail_card?
         # transfer money
@@ -127,6 +82,73 @@ module Monopoly
         card, card_stack = @jail_cards.shift
         player.add_jail_card(card, card_stack)
       end
+    end
+  end
+  
+  class Player
+    include HasStreets
+    include HasStreetsWithHouses
+    include HasJailCards
+    
+    attr_reader :name, :money
+    attr_accessor :current_field, :in_jail
+    
+    def initialize(name)
+      @name = name
+      @streets = []
+      @money = 30000
+      @jail_cards = []
+      @rolled_a_double = 0
+      @in_jail = false
+    end
+    
+    def value
+      money + streets.inject(0) { |sum, street| sum += street.value }
+    end
+    
+    # DEFAULT IMPLEMENTATION: will be changed in later strategie implementations
+    def do_actions(other_players, type = :normal)
+      if type == :normal and current_field.buyable?
+        current_field.buy(self) if current_field.price < money
+      end
+    end
+    
+    # DEFAULT IMPLEMENTATION: will be changed in later strategie implementations
+    def do_auction(field, highest_offer)
+      rand(500)
+    end
+    
+    # DEFAULT IMPLEMENTATION: will be changed in later strategie implementations
+    def do_jail(other_players)
+      # dice as default
+    end
+    
+    # DEFAULT IMPLEMENTATION: will be changed in later strategie implementations
+    def do_pay_sum(sum_left)
+      @streets.first.mortgage
+    end
+    
+    def can_act?
+      !@in_jail
+    end
+    
+    def rolled_a_double
+      @rolled_a_double += 1
+      (@rolled_a_double == 3) ? true : false
+    end
+    
+    def reset_rolled_a_double
+      @rolled_a_double = 0
+    end
+    
+    def transfer_money_to(receiver, amount)
+      if receiver != :bank
+        receiver.raise_money(amount)
+        logger.player_info(self, "transfer #{amount} from [#{self.name}] to [#{receiver.name}]")
+      else  
+        logger.player_info(self, "transfer #{amount} from [#{self.name}] to [bank]")
+      end
+      decrease_money(amount)
     end
 
     def raise_money(amount)

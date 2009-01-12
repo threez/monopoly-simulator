@@ -112,7 +112,7 @@ module Monopoly
     def enter_field(player, field)
       set_player_position(player, field)
       if field.respond_to? :enter_field
-        logger.player_info(player, "entering field #{field.name}")
+        logger.player_info(player, "entering field <#{field.name}>")
         field.enter_field(player, self)
       end
 
@@ -127,7 +127,7 @@ module Monopoly
     def pass_field(player, field)
       set_player_position(player, field)
       if field.respond_to? :pass_field
-        logger.player_info(player, "passing field #{field.name}")
+        logger.player_info(player, "passing field <#{field.name}>")
         field.pass_field(player, self)
       end
     end
@@ -146,11 +146,9 @@ module Monopoly
     
     # value can ether be a field or a dice value
     def player_move_to(player, field, kind = :forward)
-      next_field = if kind == :forward
-                     next_field_for(player)
-                   else
-                     prev_field_for(player)
-                   end
+      next_field = (kind == :forward) ?
+        next_field_for(player) :
+        prev_field_for(player)
         
       if next_field == field
         enter_field(player, next_field)
@@ -161,6 +159,8 @@ module Monopoly
     end
     
     def player_move_dice_value(player, dice_value)
+      tmp_current_field = player.current_field
+      
       if dice_value > 0 # move forward
         (dice_value - 1).times do
           pass_field(player, next_field_for(player))
@@ -172,6 +172,8 @@ module Monopoly
         end
         enter_field(player, prev_field_for(player))
       end
+      
+      logger.player_info(player, "<#{tmp_current_field.name}> #{dice_value} moves to <#{player.current_field.name}>")
     end
     
     def next_field_for(player)
@@ -207,13 +209,8 @@ module Monopoly
         end
       end
       
-      # if in jail after a third rolled a double quit turn 
       if play_dices(player)
-        # handle if player is in jail and dices
-        return if player_in_jail?(player) and !dice_again
-      
-        # move the player
-        player_move_dice_value(player, @dices_value)
+        player_move_dice_value(player, dices_value)
         
         # play again if he has rolled a double
         play_turn(player) if dice_again
@@ -246,22 +243,22 @@ module Monopoly
       dice1, dice2 = play_dice, play_dice
       @dices_value = dice1 + dice2
       @dice_again = false
-      logger.player_info(player, "dices rolled: #{@dices_value} (#{dice1}, #{dice2})")
     
-      if dice1 == dice2
-        player.rolled_a_double += 1
-        if player.rolled_a_double == 3
-          self.go_to_jail(player)
-          player.reset_rolled_a_double
+      if dice1 == dice2 # double
+        if player_in_jail?(player)
+          leave_jail(player)
+          return true
+        elsif player.rolled_a_double
+          go_to_jail(player)
           return false
-        else
-          @dice_again = true
         end
-      else
+        
+        @dice_again = true
+        logger.player_info(player, "rolled a double (#{dice1} + #{dice2})")
+      else  
         player.reset_rolled_a_double
+        return !player_in_jail?(player)
       end
-      
-      true
     end
 
     def play_dice()

@@ -31,11 +31,11 @@ module Monopoly
       end
 
       def player_has_to_pay?(player)
-        !buyable? and !@owner.in_jail and player != @owner and !@owner.in_jail
+        !@owner.nil? and @owner.can_act? and player != @owner
       end
 
       def owner=(player)
-        # just set the owner if there is no other owner
+        # only set the owner if there is no other owner
         @owner = player if @owner.nil?
       end
 
@@ -83,8 +83,7 @@ module Monopoly
 
       def enter_field(player, playing_field)
         if player_has_to_pay?(player)
-          player.transfer_money_to(@owner, self.charge)
-          logger.player_info(player, "pay charge to #{@owner.name} (#{self.charge})")
+          player.transfer_money_to(@owner, charge)
         end
       end
     end
@@ -185,7 +184,7 @@ module Monopoly
       end
       
       def value
-        price + houses * @charge_house
+        super + houses * @charge_house
       end
 
       def charge
