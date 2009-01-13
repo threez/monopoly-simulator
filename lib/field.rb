@@ -3,7 +3,7 @@ require File.dirname(__FILE__) + "/cards"
 module Monopoly
   module Fields
     module Buyable
-      def mortgage
+      def mortgage!
         @owner.raise_money(price / 2)
         @mortgage = true
         @interest = 1.10  # 10% interest
@@ -128,23 +128,15 @@ module Monopoly
 
       def other_fields_houses
         other_fields = fields_of_kind.select { |field| field != self }
-        other_fields.inject(0) { |sum, field| sum += field.houses }
+        other_fields.inject(0) { |sum, field| sum + field.houses }
       end
 
       def more_houses_possible?
-        @houses < HOTEL
+        @houses < HOTEL and other_fields_houses >= houses * (@count_of_kind.size - 1)
       end
 
       def house_buyable?
-        if all_streets_of_a_kind_without_mortgage? and more_houses_possible?
-          if other_fields_houses >= @houses * (@count_of_kind.size - 1)
-            true
-          else
-            false
-          end
-        else
-          false
-        end
+        all_streets_of_a_kind_without_mortgage? and more_houses_possible?
       end
       
       def sellable?
@@ -152,15 +144,7 @@ module Monopoly
       end
 
       def house_sellable?
-        if @houses > 0
-          if other_fields_houses <= @houses * (@count_of_kind.size - 1)
-            true
-          else
-            false
-          end
-        else
-          false
-        end
+        @houses > 0 and other_fields_houses <= houses * (@count_of_kind.size - 1)
       end
 
       def buy_house
@@ -238,7 +222,7 @@ module Monopoly
     class Street < Field
       include Constructible
 
-      attr_accessor :color, :count_of_kind
+      attr_accessor :color, :count_of_kind, :charge_house
 
       def initialize(color, name, price, charge, charge_house)
         super(name)

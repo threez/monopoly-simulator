@@ -22,7 +22,11 @@ def print_player(player)
   puts "Values: #{player.value}"
   puts " Streets:"
   player.streets.each do |street|
-    puts "  - #{street.name}: value => #{street.value} "
+    if street.class != Fields::Street
+      puts "  - #{street.name}: value => #{street.value} "
+    else
+      puts "  - #{street.name}:[#{street.color}] houses => #{street.houses} value => #{street.value} "
+    end
   end
   puts " Can build on:"
   player.find_buildable_streets.each do |street|

@@ -34,7 +34,7 @@ module Monopoly
     def find_buildable_streets()
       buildable_streets = []
       streets.each do |street|
-        if street.class == Fields::Street and street.house_buyable?
+        if street.class == Fields::Street and street.all_streets_of_a_kind?
           buildable_streets << street
         end
       end
@@ -43,14 +43,14 @@ module Monopoly
     
     def houses
       find_streets(Fields::Street).inject(0) do |sum, street| 
-        sum += 1 if street.houses > 0 and street.houses < Fields::Constructible::HOTEL
-      end.to_i
+        (street.houses > 0 and street.houses < Fields::Constructible::HOTEL) ? sum + 1 : sum
+      end
     end
     
     def hotels
       find_streets(Fields::Street).inject(0) do |sum, street|
-        sum += 1 if street.houses == Fields::Constructible::HOTEL
-      end.to_i
+        (street.houses == Fields::Constructible::HOTEL) ? sum + 1 : sum
+      end
     end
   end
   
@@ -109,12 +109,30 @@ module Monopoly
     # DEFAULT IMPLEMENTATION: will be changed in later strategie implementations
     def do_actions(other_players, type = :normal)
       if type == :normal and current_field.buyable?
+        # simple buy field
         current_field.buy(self) if current_field.price < money
+      
+        # simple payback mortgage if any
+        @streets.each do |street|
+          if street.mortgage? and street.price / 2 < money / 2
+            street.amortize_the_mortgage
+          end
+        end
+      
+        # simple build streets
+        if can_build_house?
+          3.times do 
+            find_buildable_streets.each do |street|
+              street.buy_house if street.charge_house < money / 3
+            end
+          end
+        end  
       end
     end
     
     # DEFAULT IMPLEMENTATION: will be changed in later strategie implementations
     def do_auction(field, highest_offer)
+      # simple bid
       rand(500)
     end
     
@@ -125,7 +143,8 @@ module Monopoly
     
     # DEFAULT IMPLEMENTATION: will be changed in later strategie implementations
     def do_pay_sum(sum_left)
-      @streets.first.mortgage
+      # simple pay debt
+      @streets.first.mortgage!
     end
     
     def can_act?

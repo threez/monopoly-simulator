@@ -242,23 +242,24 @@ module Monopoly
     def play_dices(player)
       dice1, dice2 = play_dice, play_dice
       @dices_value = dice1 + dice2
-      @dice_again = false
     
       if dice1 == dice2 # double
         if player_in_jail?(player)
           leave_jail(player)
-          return true
         elsif player.rolled_a_double
           go_to_jail(player)
           return false
+        else
+          @dice_again = true
+          logger.player_info(player, "rolled a double (#{dice1} + #{dice2})")
         end
-        
-        @dice_again = true
-        logger.player_info(player, "rolled a double (#{dice1} + #{dice2})")
       else  
+        @dice_again = false
         player.reset_rolled_a_double
         return !player_in_jail?(player)
-      end
+      end  
+      
+      return true
     end
 
     def play_dice()
