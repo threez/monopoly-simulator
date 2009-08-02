@@ -1,38 +1,13 @@
-require "../lib/playing_field"
-require "../lib/human_player"
-require "pp"
+require File.join(File.dirname(__FILE__), "..", "lib", "monopoly")
 include Monopoly
 
-if false
-  vincent = HumanPlayer.new("Vincent")
-  lisa = HumanPlayer.new("Lisa")
-else
-  vincent = Player.new("Vincent")
-  lisa = Player.new("Lisa")
-end
+log = HtmlLog.new("log.html")
 
-players = [vincent, lisa]
-pf = PlayingField.new(players)
+player1 = StupidPlayer.new("John")
+player2 = StupidPlayer.new("Marie")
+field = PlayingField.new([player1, player2], Parker1996)
+field.add_observer(log)
+field.play_game(10)
 
-# play 1000 turns
-1000.times { players.each { |player| pf.play_turn player } }
-
-def print_player(player)
-  puts "## #{player.name} " + "#" * 50
-  puts "Values: #{player.value}"
-  puts " Streets:"
-  player.streets.each do |street|
-    if street.class != Fields::Street
-      puts "  - #{street.name}: value => #{street.value} "
-    else
-      puts "  - #{street.name}:[#{street.color}] houses => #{street.houses} value => #{street.value} "
-    end
-  end
-  puts " Can build on:"
-  player.find_buildable_streets.each do |street|
-    puts "  - #{street.name}:[#{street.color}] houses => #{street.houses} value => #{street.value} "
-  end
-end
-
-print_player vincent
-print_player lisa
+log.save
+system "open log.html"

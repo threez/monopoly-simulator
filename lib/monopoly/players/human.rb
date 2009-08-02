@@ -1,5 +1,3 @@
-require File.dirname(__FILE__) + "/player"
-
 module Monopoly
   class HumanPlayer < Player
     def read(msg = nil)

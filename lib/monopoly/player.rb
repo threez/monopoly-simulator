@@ -86,12 +86,12 @@ module Monopoly
   end
   
   class Player
-    include HasStreets
+    include HasStreets 
     include HasStreetsWithHouses
     include HasJailCards
     
     attr_reader :name, :money
-    attr_accessor :current_field, :in_jail
+    attr_accessor :current_field, :in_jail, :playing_field
     
     def initialize(name)
       @name = name
@@ -104,47 +104,6 @@ module Monopoly
     
     def value
       money + streets.inject(0) { |sum, street| sum += street.value }
-    end
-    
-    # DEFAULT IMPLEMENTATION: will be changed in later strategie implementations
-    def do_actions(other_players, type = :normal)
-      if type == :normal and current_field.buyable?
-        # simple buy field
-        current_field.buy(self) if current_field.price < money
-      
-        # simple payback mortgage if any
-        @streets.each do |street|
-          if street.mortgage? and street.price / 2 < money / 2
-            street.amortize_the_mortgage
-          end
-        end
-      
-        # simple build streets
-        if can_build_house?
-          3.times do 
-            find_buildable_streets.each do |street|
-              street.buy_house if street.charge_house < money / 3
-            end
-          end
-        end  
-      end
-    end
-    
-    # DEFAULT IMPLEMENTATION: will be changed in later strategie implementations
-    def do_auction(field, highest_offer)
-      # simple bid
-      rand(500)
-    end
-    
-    # DEFAULT IMPLEMENTATION: will be changed in later strategie implementations
-    def do_jail(other_players)
-      # dice as default
-    end
-    
-    # DEFAULT IMPLEMENTATION: will be changed in later strategie implementations
-    def do_pay_sum(sum_left)
-      # simple pay debt
-      @streets.first.mortgage!
     end
     
     def can_act?
@@ -163,10 +122,9 @@ module Monopoly
     def transfer_money_to(receiver, amount)
       if receiver != :bank
         receiver.raise_money(amount)
-        logger.player_info(self, "transfer #{amount} from [#{self.name}] to [#{receiver.name}]")
-      else  
-        logger.player_info(self, "transfer #{amount} from [#{self.name}] to [bank]")
       end
+      playing_field.notify_observers :money_transfer, :sender => self,
+        :receiver => receiver, :amount => amount
       decrease_money(amount)
     end
 

@@ -1,5 +1,3 @@
-require File.dirname(__FILE__) + "/cards"
-
 module Monopoly
   module Fields
     module Buyable
@@ -43,15 +41,16 @@ module Monopoly
         @owner
       end
 
-      def buy(player, auction_price = 0)
-        price_of_field = (auction_price == 0) ? price : auction_price
+      def buy(player, auction_price = nil)
+        price_of_field = auction_price || price 
 
         if buyable?
           if player.money >= price_of_field
             player.transfer_money_to(:bank, price_of_field)
             player.add_street(self)
             self.owner = player
-            logger.player_info(player, "buyed #{name} for #{price_of_field} (normal price: #{price})")
+            playing_field.notify_observers :buyed_street, :player => player,
+              :price_of_field => price, :paid => price_of_field, :field => self
             true
           else
             false
@@ -81,9 +80,10 @@ module Monopoly
         @owner.find_streets(self.class)
       end
 
-      def enter_field(player, playing_field)
+      def enter_field(player)
         if player_has_to_pay?(player)
           player.transfer_money_to(@owner, charge)
+          @gained_charges += charge if @gained_charges
         end
       end
     end
@@ -131,8 +131,11 @@ module Monopoly
         other_fields.inject(0) { |sum, field| sum + field.houses }
       end
 
+      # FIXME: error in rule execution
       def more_houses_possible?
-        @houses < HOTEL and other_fields_houses >= houses * (@count_of_kind.size - 1)
+        #puts "other_fields_houses: %d, %d, %s" % [other_fields_houses, houses * (@count_of_kind.size - 1), (other_fields_houses >= houses * (@count_of_kind.size - 1)).to_s]
+        #@houses < HOTEL and other_fields_houses >= houses * (@count_of_kind.size - 1)
+        @houses < HOTEL
       end
 
       def house_buyable?
@@ -151,6 +154,8 @@ module Monopoly
         if house_buyable?
           @owner.transfer_money_to(:bank, @charge_house)
           @houses += 1
+          playing_field.notify_observers :buyed_house, :player => @owner, 
+            :street => self, :charge => @charge_house
           true
         else
           false
@@ -192,6 +197,8 @@ module Monopoly
     end
     
     class Field
+      attr_accessor :playing_field
+      
       def initialize(name)
         @name = name
       end
@@ -202,137 +209,6 @@ module Monopoly
         else
           self.class
         end
-      end
-    end
-
-    class Go < Field
-      include NotBuyable
-
-      def enter_field(player, playing_field)
-        logger.player_info(player, "entered go field, raised 8000 (#{player.money})")
-        player.raise_money 8000
-      end
-
-      def pass_field(player, playing_field)
-        logger.player_info(player, "passed go field, raised 4000 (#{player.money})")
-        player.raise_money 4000
-      end
-    end
-
-    class Street < Field
-      include Constructible
-
-      attr_accessor :color, :count_of_kind, :charge_house
-
-      def initialize(color, name, price, charge, charge_house)
-        super(name)
-        @color = color
-        @price = price
-
-        # for constructible
-        @charge = charge
-        @charge_house = charge_house
-        @houses = 0
-      end
-    end
-
-    class Station < Field
-      include Buyable
-      
-      CHARGE = { 1 => 500, 2 => 1000, 3 => 2000, 4 => 4000 }
-
-      def initialize(name)
-        super(name)
-        @price = 4000
-      end
-
-      def charge
-        CHARGE[fields_of_same_kind.size]
-      end
-    end
-
-    class Plant < Field
-      include Buyable
-
-      def initialize(name)
-        super(name)
-        @price = 3000
-      end
-
-      def enter_field(player, playing_field)
-        if player_has_to_pay?(player)
-          multiplyer = (fields_of_same_kind.size == 1) ? 80 : 200
-          charge = multiplyer * playing_field.dices_value
-          player.transfer_money_to(@owner, charge)
-        end
-      end
-    end
-    
-    class CardField < Field
-      include NotBuyable
-      
-      def initialize(card_stack)
-        super(card_stack.name)
-        @card_stack = card_stack
-      end
-      
-      def enter_field(player, playing_field)
-        card = CommunityCards.next_card
-        card.use(@card_stack, player, playing_field.other_players(player), playing_field)
-      end
-    end
-
-    class Tax < Field
-      include NotBuyable
-
-      def initialize(name, price)
-        super(name)
-        @price = price
-      end
-
-      def enter_field(player, playing_field)
-        player.transfer_money_to(:bank, @price)
-      end
-    end
-
-    class Jail < Field
-      include NotBuyable
-
-      attr_accessor :prisoners
-
-      def initialize(name)
-        super(name)
-        @prisoners = []
-      end
-    
-      def <<(prisoner)
-        @prisoners << prisoner
-        prisoner.in_jail = true
-      end
-    
-      def leave(prisoner)
-        @prisoners.delete prisoner
-        prisoner.in_jail = false
-      end
-    
-      def is_prisoner?(prisoner)
-        @prisoners.include? prisoner
-      end
-
-      def enter_field(player, playing_field)
-        # visiting the prisoners
-      end
-    end
-
-    class Parking < Field
-      include NotBuyable
-    end
-
-    class GoJail < Field
-      include NotBuyable
-      
-      def enter_field(player, playing_field)
-        playing_field.go_to_jail player
       end
     end
   end
