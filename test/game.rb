@@ -1,4 +1,3 @@
-require File.join(File.dirname(__FILE__), "..", "lib", "monopoly")
 include Monopoly
 
 log = HtmlLog.new("log.html")
